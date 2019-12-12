@@ -1,7 +1,7 @@
 import React from 'react';
-import {Button, Col, Form, Jumbotron, Row} from "react-bootstrap";
+import {Button, Col, Form, Jumbotron, Row, Spinner} from "react-bootstrap";
 
-const Searcher = ({artist, handleChange, handleClick}) => {
+const Searcher = ({artist, handleChange, handleClick, loading}) => {
   return (
     <Jumbotron className="mt-5">
       <Row className="justify-content-center">
@@ -15,13 +15,25 @@ const Searcher = ({artist, handleChange, handleClick}) => {
                 type="text"
                 placeholder="Red hot chili peppers"
                 value={artist}
+                size="lg"
                 onChange={(event) => handleChange(event.target.value)}
               />
               <Button
                 variant="warning"
                 onClick={handleClick}
+                size="lg"
+                disabled={loading}
               >
-                Go!
+              {loading &&
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  role="status"
+                  aria-hidden="true"
+                  size="sm"
+                 />
+                }
+                {loading ? "" : "Search"}
               </Button>
             </Col>
           </Form.Group>

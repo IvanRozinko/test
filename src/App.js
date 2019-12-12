@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import TableResults from "./components/TableResults";
 import Searcher from "./components/Searcher";
@@ -7,9 +7,11 @@ import Searcher from "./components/Searcher";
 function App() {
   const [artist, setArtist] = useState('');
   const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleClick = () => {
     console.log('click');
+    setLoading(true);
     fetchData();
   };
 
@@ -24,15 +26,21 @@ function App() {
     const deezerUrl = `${prefix}https://api.deezer.com/search?q=${query}}`;
     const itunesUrl = `${prefix}https://itunes.apple.com/search?term=${query}}`;
 
-    const promiseDeezer = await fetch(deezerUrl);
-    const promiseItunes = await fetch(itunesUrl);
+    try{
+      const promiseDeezer = await fetch(deezerUrl);
+      const promiseItunes = await fetch(itunesUrl);
 
-    const resDeezer = await promiseDeezer.json();
-    const resItunes = await promiseItunes.json();
+      const resDeezer = await promiseDeezer.json();
+      const resItunes = await promiseItunes.json();
+      setLoading(false);
 
-    console.log(resDeezer.data);
-    console.log(resItunes.results);
-    filter([resDeezer.data, resItunes.results]);
+      console.log(resDeezer.data);
+      console.log(resItunes.results);
+      filter([resDeezer.data, resItunes.results]);
+    } catch(error){
+      console.log(error);
+    }
+
 
   };
 
@@ -81,6 +89,7 @@ function App() {
         artist={artist}
         handleChange={handleChange}
         handleClick={handleClick}
+        loading={loading}
       />
      { list.length > 0 &&
      <TableResults list={list}/>
