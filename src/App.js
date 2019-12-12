@@ -1,78 +1,90 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Jumbotron, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import TableResults from "./components/TableResults";
+import Searcher from "./components/Searcher";
 
 function App() {
   const [artist, setArtist] = useState('');
+  const [list, setList] = useState([]);
 
   const handleClick = () => {
     console.log('click');
     fetchData();
   };
 
-  const fetchData = () => {
+  const handleChange = (value) => {
+    setArtist(value);
+  };
+
+  const fetchData = async () => {
     const prefix = 'https://cors-anywhere.herokuapp.com/';
     const query = encodeURI(artist);
     console.log(query);
     const deezerUrl = `${prefix}https://api.deezer.com/search?q=${query}}`;
     const itunesUrl = `${prefix}https://itunes.apple.com/search?term=${query}}`;
 
-    const promiseDeezer = fetch(deezerUrl);
-    const promiseItunes = fetch(itunesUrl);
+    const promiseDeezer = await fetch(deezerUrl);
+    const promiseItunes = await fetch(itunesUrl);
 
-    const resDeezer = promiseDeezer.then( res => res.json());
-    const resItunes = promiseItunes.then( res => res.json());
+    const resDeezer = await promiseDeezer.json();
+    const resItunes = await promiseItunes.json();
 
-    let list = [];
-    resDeezer.then(res => {
-        res.data.map( artist => {
-          const {
-            artist: { name },
-            album: { title, cover_medium }
-          } = artist;
+    console.log(resDeezer.data);
+    console.log(resItunes.results);
+    filter([resDeezer.data, resItunes.results]);
 
-          list.push(
+  };
+
+  const filter = ([ listDeezer, listItunes ]) => {      //TODO: Remove repeating albums from results;
+    const albums = new Set();
+    listDeezer.forEach( item => {
+      const {album: {title, cover_small, tracklist}, artist: {name}} = item;
+
+      albums.add(
+        {
+          [title]:
             {
-              name,
               album: title,
-              image: cover_medium,
+              cover: cover_small,
+              link: tracklist,
+              name
+            }
+        }
+      );
 
-            })
-        });
-        console.log(list);
-    }
+    });
 
-    );   // save next link to fetch more
-    resItunes.then(data => console.log(data.results));
+      listItunes.forEach( item => {
+        const { collectionName, artworkUrl30, collectionViewUrl, artistName } = item;
+
+        albums.add(
+          {
+            [collectionName]:
+              {
+                album: collectionName,
+                cover: artworkUrl30,
+                link: collectionViewUrl,
+                name: artistName
+              }
+          }
+        );
+
+    });
+
+    albums.forEach(item => console.log(item))
   };
 
   return (
    <Container>
-     <Jumbotron className="mt-5">
-     <Row className="justify-content-center">
-       <h1>Searcher</h1>
-     </Row>
-     <Row className="justify-content-center">
-       <Form>
-         <Form.Group>
-           <Col className="d-flex">
-             <Form.Control
-               type="text"
-               placeholder="Red hot chili peppers"
-               value={artist}
-               onChange={(event) => setArtist(event.target.value)}
-             />
-             <Button
-               variant="warning"
-               onClick={handleClick}
-             >
-               Go!
-             </Button>
-           </Col>
-         </Form.Group>
-       </Form>
-     </Row>
-     </Jumbotron>
+      <Searcher
+        artist={artist}
+        handleChange={handleChange}
+        handleClick={handleClick}
+      />
+     { list.length > 0 &&
+     <TableResults list={list}/>
+     }
    </Container>
   );
 }
