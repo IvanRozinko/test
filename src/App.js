@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Spinner } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import TableResults from "./components/TableResults";
 import Searcher from "./components/Searcher";
@@ -34,53 +34,51 @@ function App() {
       const resItunes = await promiseItunes.json();
       setLoading(false);
 
-      console.log(resDeezer.data);
-      console.log(resItunes.results);
+      console.log(resDeezer);
+      console.log(resItunes);
       filter([resDeezer.data, resItunes.results]);
     } catch(error){
       console.log(error);
     }
-
-
   };
 
-  const filter = ([ listDeezer, listItunes ]) => {      //TODO: Remove repeating albums from results;
-    const albums = new Set();
+  const filter = ([ listDeezer, listItunes ]) => {
+
+    const albums = [];
+    const titlesSet = new Set();
+
     listDeezer.forEach( item => {
-      const {album: {title, cover_small, tracklist}, artist: {name}} = item;
-
-      albums.add(
-        {
-          [title]:
-            {
-              album: title,
-              cover: cover_small,
-              link: tracklist,
-              name
-            }
-        }
-      );
-
-    });
-
-      listItunes.forEach( item => {
-        const { collectionName, artworkUrl30, collectionViewUrl, artistName } = item;
-
-        albums.add(
+      const {album: {title, cover_small, tracklist }, artist: {name}, preview} = item;
+      if (!titlesSet.has(title) && title) {
+        titlesSet.add(title);
+        albums.push(
           {
-            [collectionName]:
-              {
-                album: collectionName,
-                cover: artworkUrl30,
-                link: collectionViewUrl,
-                name: artistName
-              }
+            album: title,
+            cover: cover_small,
+            link: tracklist,
+            name,
+            preview
           }
         );
-
+      }
     });
 
-    albums.forEach(item => console.log(item))
+    listItunes.forEach( item => {
+      const { collectionName, artworkUrl60, collectionViewUrl, artistName, previewUrl } = item;
+      if (!titlesSet.has(collectionName) && collectionName) {
+        titlesSet.add(collectionName);
+        albums.push(
+          {
+            album: collectionName,
+            cover: artworkUrl60,
+            link: collectionViewUrl,
+            name: artistName,
+            preview: previewUrl
+          }
+        );
+      }
+    });
+    setList(albums);
   };
 
   return (

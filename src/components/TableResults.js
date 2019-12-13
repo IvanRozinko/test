@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Player from './Player';
 import { Table, Row, Col, Jumbotron } from 'react-bootstrap';
 
 const TableResults = (props) => {
@@ -15,18 +15,20 @@ const TableResults = (props) => {
               <th>Cover</th>
               <th>Album</th>
               <th>Artist</th>
-              <th>Link</th>
+              <th>Preview</th>
             </tr>
             </thead>
             <tbody>
-            {list.map( (artist, index) =>
-              <tr key={artist.album}>
-                <td>{index}</td>
-                <td><img src={artist.cover} alt="album cover"/></td>
-                <td>{artist.album}</td>
-                <td>{artist.name}</td>
-                <td>{artist.link}</td>
-              </tr>
+            {list.map( ({ album, name, link, cover, preview}, index) =>
+                <tr key={album}>
+                  <td>{index + 1}</td>
+                  <td><a href={link}><img src={cover} alt="album cover"/></a></td>
+                  <td>{album}</td>
+                  <td>{name}</td>
+                  <td>
+                    <Player trackUrl={preview}/>
+                  </td>
+                </tr>
               )
             }
             </tbody>
