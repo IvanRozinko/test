@@ -39,11 +39,5 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^1.7.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "node_modules/.bin/eslint . --max-warnings=0",
-      "pre-push": "node_modules/.bin/eslint . --max-warnings=0"
-    }
   }
 }
