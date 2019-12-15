@@ -8,7 +8,7 @@ const TableResults = (props) => {
     <Jumbotron>
       <Row>
         <Col>
-          <Table>
+          <Table hover>
             <thead>
             <tr>
               <th>#</th>
@@ -19,9 +19,9 @@ const TableResults = (props) => {
             </tr>
             </thead>
             <tbody>
-            {list.map( ({ album, name, link, cover, preview}, index) =>
-                <tr key={album}>
-                  <td>{index + 1}</td>
+            {list.map( ({ album, name, link, cover, preview, id}, index) =>
+                <tr key={id}>
+                  <td className="text-center">{index + 1}</td>
                   <td><a href={link}><img src={cover} alt="album cover"/></a></td>
                   <td>{album}</td>
                   <td>{name}</td>
@@ -35,7 +35,15 @@ const TableResults = (props) => {
           </Table>
         </Col>
       </Row>
+      <style jsx="true">
+        {`
+        .table > tbody > tr > td {
+          vertical-align: middle;
+         }
+        `}
+      </style>
     </Jumbotron>
   );
 };
+
 export default TableResults;

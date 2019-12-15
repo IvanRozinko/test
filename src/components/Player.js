@@ -23,4 +23,5 @@ const Player = ({trackUrl}) => {
     </Button>
   );
 };
+
 export default Player;
